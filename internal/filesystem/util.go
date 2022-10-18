@@ -1,6 +1,7 @@
 package filesystem
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 
@@ -25,6 +26,11 @@ func GetAbsPath(path string, workingDir string) string {
 
 // Checks if the given path points to a directory
 func PathIsDir(path string) bool {
+
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return false
+	}
+
 	file, err := os.Open(path)
 	if err != nil {
 		log.Error().AnErr("error", err).Msg("Error opening path")

@@ -14,13 +14,16 @@ import (
 func Write(outputPath string, report junit.JUnitReport) error {
 	log.Debug().Msg("report output as junit")
 
-	if outputPath == "" {
-		var err error
-		outputPath, err = os.Getwd()
-		if err != nil {
-			return err
-		}
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return err
 	}
+
+	if outputPath == "" {
+		outputPath = workingDir
+	}
+
+	outputPath = filesystem.GetAbsPath(outputPath, workingDir)
 
 	// if output points to folder, assume default filename for writing
 	if filesystem.PathIsDir(outputPath) {
