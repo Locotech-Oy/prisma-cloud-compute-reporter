@@ -1,5 +1,7 @@
 package parser
 
+import "time"
+
 // ScanReport represents the root of the twistcli json report
 type ScanReport struct {
 	Results []Result `json:"results"`
@@ -19,6 +21,7 @@ type Result struct {
 	Vulnerabilities           []Vulnerability `json:"vulnerabilities"`
 	VulnerabilityDistribution Distribution    `json:"vulnerabilityDistribution"`
 	VulnerabilityScanPassed   bool            `json:"vulnerabilityScanPassed"`
+	ScanTime                  time.Time       `json:"scanTime"`
 }
 
 type Package struct {
@@ -52,10 +55,19 @@ type Complicance struct {
 }
 
 type Vulnerability struct {
-	Id     string  `json:"id"`
-	Status string  `json:"status"`
-	Cvss   float32 `json:"cvss"`
-	Vector string  `json:"vector"`
-
-	LayerTime string `json:"layerTime"`
+	Id               string    `json:"id"`
+	Severity         string    `json:"severity"`
+	Status           string    `json:"status"`
+	Cvss             float32   `json:"cvss"`
+	Vector           string    `json:"vector"`
+	Description      string    `json:"description"`
+	PackageName      string    `json:"packageName"`
+	PackageVersion   string    `json:"packageVersion"`
+	Link             string    `json:"link"`
+	RiskFactors      []string  `json:"riskFactors"`
+	ImpactedVersions []string  `json:"impactedVersions"`
+	PublishedDate    time.Time `json:"publishedDate"`
+	DiscoveredDate   time.Time `json:"discoveredDate"`
+	FixDate          time.Time `json:"fixDate"`
+	LayerTime        time.Time `json:"layerTime"`
 }

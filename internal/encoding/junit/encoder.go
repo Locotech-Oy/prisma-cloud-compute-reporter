@@ -25,6 +25,16 @@ func EncodeScanReport(report parser.ScanReport) JUnitReport {
 
 	vulnerabilitySuite := createVulnerabilitySuiteWithProps(report.Results[0])
 
+	for _, vuln := range report.Results[0].Vulnerabilities {
+
+		if report.Results[0].VulnerabilityScanPassed {
+			vulnerabilitySuite.TestCases = append(vulnerabilitySuite.TestCases, createSkippedVTestCase(vuln))
+		} else {
+			vulnerabilitySuite.TestCases = append(vulnerabilitySuite.TestCases, createFailureVTestCase(vuln))
+		}
+
+	}
+
 	testSuites = append(testSuites, complianceSuite, vulnerabilitySuite)
 
 	rtn := JUnitReport{
@@ -40,12 +50,13 @@ func createFailureTestCase(comp parser.Complicance) TestCase {
 	return TestCase{
 		Name:      className + " " + comp.Title,
 		ClassName: className,
-		Failure: Failure{
-			Type:    "failure",
+		Time:      0,
+		Failure: &Failure{
+			Type:    "compliance",
 			Message: comp.Title,
 			Description: `Severity: ` + comp.Severity + `
-Category` + comp.Category + `
-Description` + comp.Description,
+Category: ` + comp.Category + `
+Description: ` + comp.Description,
 		},
 	}
 }
@@ -56,18 +67,49 @@ func createSkippedTestCase(comp parser.Complicance) TestCase {
 	return TestCase{
 		Name:      className + " " + comp.Title,
 		ClassName: className,
-		Skipped: Skipped{
-			Type:    "skipped",
+		Time:      0,
+		Skipped: &Skipped{
 			Message: comp.Title,
 			Description: `Severity: ` + comp.Severity + `
-Category` + comp.Category + `
-Description` + comp.Description,
+Category: ` + comp.Category + `
+Description: ` + comp.Description,
+		},
+	}
+}
+
+func createFailureVTestCase(vulnerability parser.Vulnerability) TestCase {
+	className := "[" + vulnerability.Id + "]"
+
+	return TestCase{
+		Name:      className + " " + vulnerability.Description,
+		ClassName: vulnerability.PackageName + "_" + vulnerability.PackageVersion,
+		Time:      0,
+		Failure: &Failure{
+			Type:    "vulnerability",
+			Message: vulnerability.Description,
+			Description: `Severity: ` + vulnerability.Severity + `
+Description: ` + vulnerability.Description,
+		},
+	}
+}
+
+func createSkippedVTestCase(vulnerability parser.Vulnerability) TestCase {
+	className := "[" + vulnerability.Id + "]"
+
+	return TestCase{
+		Name:      className + " " + vulnerability.Description,
+		ClassName: vulnerability.PackageName + "_" + vulnerability.PackageVersion,
+		Time:      0,
+		Skipped: &Skipped{
+			Message: vulnerability.Description,
+			Description: `Severity: ` + vulnerability.Severity + `
+Description: ` + vulnerability.Description,
 		},
 	}
 }
 
 func createComplianceSuiteWithProps(result parser.Result) TestSuite {
-	suite := createTestSuiteWithProps(result, "Prisma Cloud compliance scan")
+	suite := createTestSuiteWithProps(1, result, "Prisma Cloud compliance scan")
 	suite.Properties = append(suite.Properties,
 		Property{
 			Name:  "complianceScanPassed",
@@ -98,7 +140,7 @@ func createComplianceSuiteWithProps(result parser.Result) TestSuite {
 }
 
 func createVulnerabilitySuiteWithProps(result parser.Result) TestSuite {
-	suite := createTestSuiteWithProps(result, "Prisma Cloud vulnerability scan")
+	suite := createTestSuiteWithProps(2, result, "Prisma Cloud vulnerability scan")
 	suite.Properties = append(suite.Properties,
 		Property{
 			Name:  "vulnerabilityScanPassed",
@@ -128,7 +170,7 @@ func createVulnerabilitySuiteWithProps(result parser.Result) TestSuite {
 	return suite
 }
 
-func createTestSuiteWithProps(result parser.Result, name string) TestSuite {
+func createTestSuiteWithProps(id int, result parser.Result, name string) TestSuite {
 
 	properties := []Property{
 		{
@@ -154,7 +196,12 @@ func createTestSuiteWithProps(result parser.Result, name string) TestSuite {
 	}
 
 	return TestSuite{
-		Name:       name,
+		Id:        id,
+		Name:      name,
+		Hostname:  "localhost",
+		Timestamp: result.ScanTime.Format("2006-01-02T15:04:05"),
+		// PC scan report does not include scan duration, so always 0
+		Time:       0,
 		Properties: properties,
 	}
 
