@@ -61,14 +61,41 @@ var parseCmd = &cobra.Command{
 		}
 
 		outputPath, _ := cmd.Flags().GetString("output-file")
+		includeCompliance, _ := cmd.Flags().GetBool("compliance")
+		includeVulnerability, _ := cmd.Flags().GetBool("vulnerability")
 
-		// Export to file based on output format
-		encoded := junitencoder.EncodeScanReport(report)
-		err = junitwriter.Write(outputPath, encoded)
-		if err != nil {
+		outputReport := junitencoder.JUnitReport{}
+		if includeCompliance {
+			log.Debug().
+				Msg("Including compliance report")
+
+			outputReport.TestSuites = append(outputReport.TestSuites, junitencoder.EncodeComplianceReport(report).TestSuites...)
+		}
+		if includeVulnerability {
+			log.Debug().
+				Msg("Including vulnerability report")
+
+			outputReport.TestSuites = append(outputReport.TestSuites, junitencoder.EncodeVulnerabilityReport(report).TestSuites...)
+		}
+		if !includeCompliance && !includeVulnerability {
+			log.Debug().
+				Msg("Including all report sections")
+			outputReport = junitencoder.EncodeScanReport(report)
+		}
+
+		if len(outputReport.TestSuites) > 0 {
+			// Export to file based on output format
+			err = junitwriter.Write(outputPath, outputReport)
+			if err != nil {
+				log.Error().
+					Err(err).
+					Msg("Could not parse input file, exiting...")
+				os.Exit(1)
+			}
+		} else {
 			log.Error().
 				Err(err).
-				Msg("Could not parse input file, exiting...")
+				Msg("No reports included in output, exiting...")
 			os.Exit(1)
 		}
 
@@ -82,4 +109,6 @@ func init() {
 	parseCmd.Flags().StringP("output-file", "o", "", "Destination file path for parse output")
 	// TODO: Validate supported formats
 	parseCmd.Flags().StringP("output-format", "f", "junit", "Format of output file")
+	parseCmd.Flags().Bool("compliance", false, "Include compliance results in output")
+	parseCmd.Flags().Bool("vulnerability", false, "Include vulnerability results in output")
 }

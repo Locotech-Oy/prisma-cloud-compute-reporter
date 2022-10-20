@@ -27,7 +27,7 @@ func Write(outputPath string, report junit.JUnitReport) error {
 
 	// if output points to folder, assume default filename for writing
 	if filesystem.PathIsDir(outputPath) {
-		outputPath = filepath.Join(outputPath, "junit-report.xml")
+		outputPath = filepath.Join(outputPath, "pcc-junit-report.xml")
 	}
 
 	// assume output to file, ensure path is writeable
