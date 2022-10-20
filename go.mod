@@ -1,6 +1,6 @@
 module github.com/Locotech-Oy/prisma-cloud-compute-reporter
 
-go 1.18
+go 1.19
 
 require (
 	github.com/rs/zerolog v1.28.0
