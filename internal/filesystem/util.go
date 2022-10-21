@@ -31,12 +31,17 @@ func PathIsDir(path string) bool {
 		return false
 	}
 
-	file, err := os.Open(path)
+	file, err := os.Open(filepath.Clean(path))
 	if err != nil {
 		log.Error().AnErr("error", err).Msg("Error opening path")
 		os.Exit(1)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Error().AnErr("error", err).Msg("Failed to close file")
+			os.Exit(1)
+		}
+	}()
 
 	fi, err := file.Stat()
 	if err != nil {

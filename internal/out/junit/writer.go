@@ -31,17 +31,28 @@ func Write(outputPath string, report junit.JUnitReport) error {
 	}
 
 	// assume output to file, ensure path is writeable
-	outputFile, err := os.OpenFile(outputPath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0744)
+	outputFile, err := os.OpenFile(filepath.Clean(outputPath), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		return err
 	}
-	defer outputFile.Close()
+	defer func() {
+		if err := outputFile.Close(); err != nil {
+			log.Error().AnErr("error", err).Msg("Failed to close file")
+		}
+	}()
 
 	log.Info().
 		Str("output_path", outputPath).
 		Msg(fmt.Sprintf("Writing JUnit report to path %s", outputPath))
-	out, _ := xml.MarshalIndent(report, "", "  ")
-	outputFile.WriteString(xml.Header + string(out))
+	out, err := xml.MarshalIndent(report, "", "  ")
+
+	if err != nil {
+		return err
+	}
+	_, err = outputFile.WriteString(xml.Header + string(out))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

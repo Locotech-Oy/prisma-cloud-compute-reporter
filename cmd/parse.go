@@ -24,6 +24,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	junitencoder "github.com/Locotech-Oy/prisma-cloud-compute-reporter/internal/encoding/junit"
 	junitwriter "github.com/Locotech-Oy/prisma-cloud-compute-reporter/internal/out/junit"
@@ -42,7 +43,7 @@ var parseCmd = &cobra.Command{
 			Str("scan_report_file", args[0]).
 			Msg(fmt.Sprintf("Reading scan report input from %s", args[0]))
 
-		f, err := os.Open(args[0])
+		f, err := os.Open(filepath.Clean(args[0]))
 
 		if err != nil {
 			log.Error().
