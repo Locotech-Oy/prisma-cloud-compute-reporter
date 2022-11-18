@@ -2,7 +2,7 @@
 
 This is a CLI tool for parsing the JSON output of a Prisma Cloud Compute scan report (twistcli) and converting it to other formats.
 
-***NOTE: This tool is provided as is and without any official support. Issues will be handled on a best effort basis. Pull requests for bugfixes and new features are welcome, if they make sense to us we will attempt to incorporate them.***
+***NOTE: This tool is provided as is and without any official support. Issues will be handled on a best effort basis. Pull requests for bugfixes and new features are welcome, we will try to include them as quickly as possible. Please see the [contribution](CONTRIBUTING.md) guidelines.***
 
 ## Install
 
