@@ -58,6 +58,62 @@ Use the following flags to adjust output:
 
 If neither ```--compliance``` or ```--vulnerabilities``` is provided all reports are merged into one file.
 
+## JUnit file format gotchas
+
+Due to the way Prisma Cloud produces it's scan reports, the JUnit report may not be quite intuitive, especially if tracking passed/failed rates and trends. Prisma Cloud only reports on vulnerabilities and compliance issues it detects, so the junit report we produce will always contain only failing or skipped tests. Thus a situation where Prisma Cloud detects zero issues, meaning everything is ok, would produce a junit report with 0% passed tests since the report would not contain any test cases at all. The following rules apply to the junit report:
+
+1. If Prisma Cloud has been set up to only report, but not fail a scan when an issue is detected, the junit report will report this as a skipped test.
+2. If Prisma Cloud has been set up to fail scans when an issue is detected, the junit report will report the issue as a failed test.
+
+## CI/CD integrations
+
+### Azure pipeline
+
+Below is a example snippet for downloading the latest release of this tool and running it in an Azure pipeline. This assumes Twistcli has been run to produce a JSON formatted scan report that can be accessed in the pipeline workspace. It parses the report into two different outputs, in order to separate the junit tests into vulnerabilities and compliance results and publish them separately for better overview.
+
+```yaml
+
+...
+
+    - task: DownloadGitHubRelease@0
+      displayName: Download PCC reporter
+      inputs:
+        connection: '<some-github-connection>'
+        userRepository: 'Locotech-Oy/prisma-cloud-compute-reporter'
+        defaultVersionType: 'latest'
+        itemPattern: '*linux_amd64.tar.gz'
+        downloadPath: '$(System.ArtifactsDirectory)'
+
+    - task: CmdLine@2
+      displayName: 'PCC report parsing'
+      inputs:
+        failOnStderr: false
+        script: |
+
+          PCC_ARCHIVE=$(find $(System.ArtifactsDirectory) -maxdepth 1 -type f -iname "*.tar.gz" | head -1)
+          echo $PCC_ARCHIVE
+          mkdir -p ./pcc-reporter
+          tar -xvzf $PCC_ARCHIVE -C ./pcc-reporter
+          ./pcc-reporter/prisma-cloud-compute-reporter image parse --vulnerability -o ./twistcli-reporting/pcc-junit-report_vulnerabilities.xml ./twistcli-reporting/pc-scan-report.json
+          ./pcc-reporter/prisma-cloud-compute-reporter image parse --compliance -o ./twistcli-reporting/pcc-junit-report_compliance.xml ./twistcli-reporting/pc-scan-report.json
+
+
+
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/twistcli-reporting/pcc-junit-report_compliance.xml'
+        testRunTitle: 'PCC compliance scan results'
+    - task: PublishTestResults@2
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/twistcli-reporting/pcc-junit-report_vulnerabilities.xml'
+        testRunTitle: 'PCC vulnerability scan results'
+
+...
+
+```
+
 ## Development
 
 ### Tests
