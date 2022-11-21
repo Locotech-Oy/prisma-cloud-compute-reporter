@@ -112,8 +112,6 @@ var parseCmd = &cobra.Command{
 					Msg("No reports included in output, exiting...")
 				os.Exit(1)
 			}
-			break
-
 		}
 
 	},
