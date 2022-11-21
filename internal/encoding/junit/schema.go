@@ -5,20 +5,14 @@ import (
 )
 
 type JUnitReport struct {
-	XMLName xml.Name `xml:"testsuites"`
-	//Disabled   int         `xml:"disabled,attr"`
-	//Errors     int         `xml:"errors,attr"`
-	//Failures   int         `xml:"failures,attr"`
-	//Time       string      `xml:"time,attr"`
-	//Tests      int         `xml:"tests,attr"`
+	XMLName    xml.Name    `xml:"testsuites"`
 	TestSuites []TestSuite `xml:"testsuite"`
 }
 
 type TestSuite struct {
-	XMLName xml.Name `xml:"testsuite"`
-	Id      int      `xml:"id,attr"`
-	Name    string   `xml:"name,attr"`
-	//Disabled   int        `xml:"disabled,attr"`
+	XMLName    xml.Name   `xml:"testsuite"`
+	Id         int        `xml:"id,attr"`
+	Name       string     `xml:"name,attr"`
 	Errors     int        `xml:"errors,attr"`
 	Failures   int        `xml:"failures,attr"`
 	Skipped    int        `xml:"skipped,attr"`
