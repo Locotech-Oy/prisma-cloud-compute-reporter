@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Locotech-Oy/prisma-cloud-compute-reporter/version"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -37,16 +38,12 @@ var logLevel string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "prisma-cloud-compute-reporter",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
+	Short: "Prisma Cloud Compute reporter converts scan reports to other formats",
+	Long: `Prisma Cloud Compute reporter takes as input a twistcli scan report in json format
+	and converts the report to various other formats.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	See the image parse command for current options of output formats.`,
+	Version: "dev",
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -63,6 +60,8 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.pcc-reporter.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&logLevel, "loglevel", "l", "info", "log level while running program [trace, debug, info, warn, error, fatal, panic]")
+
+	rootCmd.SetVersionTemplate(version.VersionStr())
 }
 
 // initConfig reads in config file and ENV variables if set.
