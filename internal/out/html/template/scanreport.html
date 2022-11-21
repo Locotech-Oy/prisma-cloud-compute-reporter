@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Prisma Cloud vulnerability and compliance scan report</title>
+  <style>
+    .table {
+      border-collapse: collapse;
+    }
+
+    .table--full-width {
+      width: 100%;
+    }
+
+    .table td,
+    .table th {
+      border: 1px solid;
+      padding: 5px;
+      vertical-align: top;
+    }
+  </style>
+</head>
+
+<h1>Prisma Cloud vulnerability and compliance scan report</h1>
+
+<body>
+  {{range .Results}}
+
+  <div class="scan-report">
+    <section class="report-metadata">
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>Scan time</td>
+            <td>{{ .ScanTime }}</td>
+          </tr>
+          <tr>
+            <td>Id</td>
+            <td>{{ .Id }}</td>
+          </tr>
+          <tr>
+            <td>Name</td>
+            <td>{{ .Name }}</td>
+          </tr>
+          <tr>
+            <td>Distro</td>
+            <td>{{ .Distro }}</td>
+          </tr>
+          <tr>
+            <td>Distro release</td>
+            <td>{{ .DistroRelease }}</td>
+          </tr>
+          <tr>
+            <td>Collections</td>
+            <td>{{ StringsJoin .Collections ", " }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="report-compliance">
+      <h2>Compliance</h2>
+      <p class="compliance-scan-status"><strong>Compliance scan passed:</strong> {{ .ComplianceScanPassed }}</p>
+
+      <div class="compliance-distribution">
+        <h3>Distribution</h3>
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Critical</td>
+              <td>{{ .ComplianceDistribution.Critical }}</td>
+            </tr>
+            <tr>
+              <td>High</td>
+              <td>{{ .ComplianceDistribution.High }}</td>
+            </tr>
+            <tr>
+              <td>Medium</td>
+              <td>{{ .ComplianceDistribution.Medium }}</td>
+            </tr>
+            <tr>
+              <td>Low</td>
+              <td>{{ .ComplianceDistribution.Low }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="compliance-issues">
+        <h3>Issues</h3>
+        <table class="table table--full-width">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Title</th>
+              <th>Severity</th>
+              <th>Category</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Compliances }}
+            <tr>
+              <td>{{ .Id }}</td>
+              <td>{{ .Title }}</td>
+              <td>{{ .Severity }}</td>
+              <td>{{ .Category }}</td>
+              <td>{{ .Description }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <section class="report-vulnerabilities">
+      <h2>Vulnerabilities</h2>
+      <p class="vulnerability-scan-status"><strong>Vulnerability scan passed:</strong> {{ .VulnerabilityScanPassed }}
+      </p>
+
+      <div class="vulnerability-distribution">
+        <h3>Distribution</h3>
+        <table class="table">
+          <tbody>
+            <tr>
+              <td>Critical</td>
+              <td>{{ .VulnerabilityDistribution.Critical }}</td>
+            </tr>
+            <tr>
+              <td>High</td>
+              <td>{{ .VulnerabilityDistribution.High }}</td>
+            </tr>
+            <tr>
+              <td>Medium</td>
+              <td>{{ .VulnerabilityDistribution.Medium }}</td>
+            </tr>
+            <tr>
+              <td>Low</td>
+              <td>{{ .VulnerabilityDistribution.Low }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="vulnerability-issues">
+        <h3>Issues</h3>
+        <table class="table table--full-width">
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Severity</th>
+              <th>Status</th>
+              <th>Cvss</th>
+              <th>Description</th>
+              <th>Link</th>
+              <th>Package name</th>
+              <th>Package version</th>
+              <th>Risk factors</th>
+              <th>Impacted versions</th>
+              <th>Published date</th>
+              <th>Discovered date</th>
+              <th>Fix date</th>
+              <th>Vector</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{ range .Vulnerabilities }}
+            <tr>
+              <td>{{ .Id }}</td>
+              <td>{{ .Severity }}</td>
+              <td>{{ .Status }}</td>
+              <td>{{ .Cvss }}</td>
+              <td>{{ .Description }}</td>
+              <td><a href="{{ .Link }}">{{ .Link }}</a></td>
+              <td>{{ .PackageName }}</td>
+              <td>{{ .PackageVersion }}</td>
+              <td>{{ StringsJoin .RiskFactors ", " }}</td>
+              <td>{{ StringsJoin .ImpactedVersions ", " }}</td>
+              <td>{{ .PublishedDate }}</td>
+              <td>{{ .DiscoveredDate }}</td>
+              <td>{{ .FixDate }}</td>
+              <td>{{ .Vector }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+  {{ end }}
+</body>
+
+</html>

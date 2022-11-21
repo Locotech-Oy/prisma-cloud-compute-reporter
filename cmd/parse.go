@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 
 	junitencoder "github.com/Locotech-Oy/prisma-cloud-compute-reporter/internal/encoding/junit"
+	htmlwriter "github.com/Locotech-Oy/prisma-cloud-compute-reporter/internal/out/html"
 	junitwriter "github.com/Locotech-Oy/prisma-cloud-compute-reporter/internal/out/junit"
 	"github.com/Locotech-Oy/prisma-cloud-compute-reporter/internal/parser"
 	"github.com/rs/zerolog/log"
@@ -61,43 +62,58 @@ var parseCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		format, _ := cmd.Flags().GetString("output-format")
 		outputPath, _ := cmd.Flags().GetString("output-file")
 		includeCompliance, _ := cmd.Flags().GetBool("compliance")
 		includeVulnerability, _ := cmd.Flags().GetBool("vulnerability")
 
-		outputReport := junitencoder.JUnitReport{}
-		if includeCompliance {
-			log.Debug().
-				Msg("Including compliance report")
-
-			outputReport.TestSuites = append(outputReport.TestSuites, junitencoder.EncodeComplianceReport(report).TestSuites...)
-		}
-		if includeVulnerability {
-			log.Debug().
-				Msg("Including vulnerability report")
-
-			outputReport.TestSuites = append(outputReport.TestSuites, junitencoder.EncodeVulnerabilityReport(report).TestSuites...)
-		}
-		if !includeCompliance && !includeVulnerability {
-			log.Debug().
-				Msg("Including all report sections")
-			outputReport = junitencoder.EncodeScanReport(report)
-		}
-
-		if len(outputReport.TestSuites) > 0 {
-			// Export to file based on output format
-			err = junitwriter.Write(outputPath, outputReport)
+		switch format {
+		case "html":
+			err = htmlwriter.Write(outputPath, report)
 			if err != nil {
 				log.Error().
 					Err(err).
-					Msg("Could not parse input file, exiting...")
+					Msg("Could not write output file, exiting...")
 				os.Exit(1)
 			}
-		} else {
-			log.Error().
-				Err(err).
-				Msg("No reports included in output, exiting...")
-			os.Exit(1)
+
+		case "junit":
+			outputReport := junitencoder.JUnitReport{}
+			if includeCompliance {
+				log.Debug().
+					Msg("Including compliance report")
+
+				outputReport.TestSuites = append(outputReport.TestSuites, junitencoder.EncodeComplianceReport(report).TestSuites...)
+			}
+			if includeVulnerability {
+				log.Debug().
+					Msg("Including vulnerability report")
+
+				outputReport.TestSuites = append(outputReport.TestSuites, junitencoder.EncodeVulnerabilityReport(report).TestSuites...)
+			}
+			if !includeCompliance && !includeVulnerability {
+				log.Debug().
+					Msg("Including all report sections")
+				outputReport = junitencoder.EncodeScanReport(report)
+			}
+
+			if len(outputReport.TestSuites) > 0 {
+				// Export to file based on output format
+				err = junitwriter.Write(outputPath, outputReport)
+				if err != nil {
+					log.Error().
+						Err(err).
+						Msg("Could not parse input file, exiting...")
+					os.Exit(1)
+				}
+			} else {
+				log.Error().
+					Err(err).
+					Msg("No reports included in output, exiting...")
+				os.Exit(1)
+			}
+			break
+
 		}
 
 	},
