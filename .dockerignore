@@ -1,0 +1,4 @@
+# Ignore dev files
+.vscode
+.github
+.goreleaser.yaml
