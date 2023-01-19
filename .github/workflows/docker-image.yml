@@ -55,8 +55,8 @@ jobs:
           pcc_console_url: ${{ secrets.PCC_CONSOLE_URL }}
           pcc_user: ${{ secrets.PCC_USER }}
           pcc_pass: ${{ secrets.PCC_PASS }}
-          image_name: ${{ steps.meta.outputs.version }}
+          image_name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
 
       # push the image manually
       - name: Push image
-        run: docker push --all-tags ${{ steps.meta.outputs.version }}
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
