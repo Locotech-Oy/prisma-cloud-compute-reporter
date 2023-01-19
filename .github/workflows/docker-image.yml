@@ -59,4 +59,4 @@ jobs:
 
       # push the image manually
       - name: Push image
-        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+        run: docker push --all-tags ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
