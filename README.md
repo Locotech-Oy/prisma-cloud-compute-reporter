@@ -35,6 +35,16 @@ Or you can use go install to install binary to global $GOPATH
 go install github.com/Locotech-Oy/prisma-cloud-compute-reporter@latest
 ```
 
+### Docker image
+
+The tool has been packaged into a docker image as well, available at <https://hub.docker.com/r/locotech/pcc-reporter>. The docker image is kept up to date with the main branch. The available commands and options are the same as for the pre-built binaries, however if you wish to use the latest version as based on the latest commits to the main branch, use the docker image.
+
+For usage instructions, simply run
+
+```text
+docker run --rm locotech/pcc-reporter:latest
+```
+
 ## Usage
 
 Running the tool with no arguments or with the -h flag will show a simple command help
