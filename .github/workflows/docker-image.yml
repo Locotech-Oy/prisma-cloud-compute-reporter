@@ -6,6 +6,7 @@ on:
     workflows: ["goreleaser"]
     types:
       - completed
+  workflow_dispatch:
 
 env:
   REGISTRY: locotech
