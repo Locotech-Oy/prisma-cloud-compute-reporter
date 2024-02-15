@@ -132,13 +132,13 @@ Use standard golang test commands from the root of the project to run unit tests
 
 Run all tests:
 
-```text
+```bash
 go test ./...
 ```
 
 Run tests including coverage and open result in browser:
 
-```text
+```bash
 go test -coverprofile=c.out -coverpkg=./... ./... && go tool cover -html=c.out -o coverage.html
 open coverage.html
 ```
