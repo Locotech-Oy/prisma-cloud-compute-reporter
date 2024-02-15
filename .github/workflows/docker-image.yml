@@ -6,8 +6,6 @@ on:
     workflows: ["goreleaser"]
     types:
       - completed
-    branches:
-      - "main"
 
 env:
   REGISTRY: locotech
@@ -17,6 +15,8 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug
+        run: echo ${{ github.event.workflow_run.head_branch }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
