@@ -49,7 +49,7 @@ docker run --rm locotech/pcc-reporter:latest
 
 Running the tool with no arguments or with the -h flag will show a simple command help
 
-```
+```bash
 ./prisma-cloud-compute-reporter -h
 ```
 
@@ -141,4 +141,12 @@ Run tests including coverage and open result in browser:
 ```bash
 go test -coverprofile=c.out -coverpkg=./... ./... && go tool cover -html=c.out -o coverage.html
 open coverage.html
+```
+
+### Build docker image locally
+
+To build the docker image locally, run
+
+```bash
+docker build -t locotech/pcc-reporter:local .
 ```
