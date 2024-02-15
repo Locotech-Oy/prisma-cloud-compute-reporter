@@ -25,6 +25,8 @@ jobs:
       - name: Release tag without prefix
         id: release_tag_no_prefix
         run: echo "{tag_no_prefix}=$${${{steps.release_tag.outputs.tag}}:1}" >> "$GITHUB_OUTPUT"
+      - name: Debug
+        run: echo "no prefix ${{steps.release_tag_no_prefix.outputs.tag_no_prefix}}"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
