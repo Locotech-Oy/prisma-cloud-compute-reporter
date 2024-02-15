@@ -16,14 +16,15 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - name: Debug
-        run: echo ${{ github.event.workflow_run.head_branch }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
       - name: 'Get latest release tag'
         id: release_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      - name: Debug
+        run: echo "Setting release tag to ${{steps.release_tag.outputs.tag}}"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -43,8 +44,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{major}}.{{minor}},value={{steps.release_tag.outputs.tag}}
-            type=semver,pattern={{version}},value={{steps.release_tag.outputs.tag}}
+            type=semver,pattern={{major}}.{{minor}},value=${{steps.release_tag.outputs.tag}}
+            type=semver,pattern={{version}},value=${{steps.release_tag.outputs.tag}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
 
