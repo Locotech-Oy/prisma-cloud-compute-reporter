@@ -24,7 +24,11 @@ jobs:
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
       - name: Release tag without prefix
         id: release_tag_no_prefix
-        run: echo "{tag_no_prefix}=${${{steps.release_tag.outputs.tag}}:1}" >> "$GITHUB_OUTPUT"
+        run: |
+          version=${{steps.release_tag.outputs.tag}}
+          echo "Version input ${version}"
+          echo "Version output ${version:1}"
+          echo "::set-output tag_no_prefix=${version:1}"
       - name: Debug
         run: echo "no prefix ${{steps.release_tag_no_prefix.outputs.tag_no_prefix}}"
       - name: Set up QEMU
