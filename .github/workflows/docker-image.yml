@@ -28,7 +28,7 @@ jobs:
           version=${{steps.release_tag.outputs.tag}}
           echo "Version input ${version}"
           echo "Version output ${version:1}"
-          echo "::set-output tag_no_prefix=${version:1}"
+          echo "tag_no_prefix=${version:1}" >> "$GITHUB_OUTPUT"
       - name: Debug
         run: echo "no prefix ${{steps.release_tag_no_prefix.outputs.tag_no_prefix}}"
       - name: Set up QEMU
