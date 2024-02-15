@@ -19,20 +19,26 @@ curl -s https://api.github.com/repos/Locotech-Oy/prisma-cloud-compute-reporter/r
 
 after this, make the downloaded file executable:
 
-```text
+```bash
 chmod +x ./prisma-cloud-compute-reporter
 ```
 
 If you prefer to build your own binary, clone this repo and run go build
 
-```text
+```bash
 go build -o <my-binary-name> main.go
 ```
 
 Or you can use go install to install binary to global $GOPATH
 
-```text
+```bash
 go install github.com/Locotech-Oy/prisma-cloud-compute-reporter@latest
+```
+
+To build the binaries for all supported architectures (i.e. the same as our release pipeline does), run
+
+```bash
+./build.sh
 ```
 
 ### Docker image
@@ -41,7 +47,7 @@ The tool has been packaged into a docker image as well, available at <https://hu
 
 For usage instructions, simply run
 
-```text
+```bash
 docker run --rm locotech/pcc-reporter:latest
 ```
 
@@ -55,7 +61,7 @@ Running the tool with no arguments or with the -h flag will show a simple comman
 
 Parsing image scan result and including both compliance and vulnerabilities into the same junit report
 
-```text
+```bash
 ./prisma-cloud-compute-reporter image parse -o pcc-junit-report.xml pcc_pipeline-scan_sample.json
 ```
 
