@@ -22,15 +22,13 @@ jobs:
       - name: 'Get latest release tag'
         id: release_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
-      - name: Release tag without prefix
+      - name: Get release tag without prefix
         id: release_tag_no_prefix
         run: |
           version=${{steps.release_tag.outputs.tag}}
           echo "Version input ${version}"
           echo "Version output ${version:1}"
           echo "tag_no_prefix=${version:1}" >> "$GITHUB_OUTPUT"
-      - name: Debug
-        run: echo "no prefix ${{steps.release_tag_no_prefix.outputs.tag_no_prefix}}"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
@@ -50,7 +48,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}},value=${{steps.release_tag.outputs.tag}}
+            type=semver,pattern={{version}},value=${{steps.release_tag.outputs.tag}},priority=950
             type=semver,pattern={{major}}.{{minor}},value=${{steps.release_tag.outputs.tag}}
             type=raw,value=latest,enable={{is_default_branch}}
             type=ref,event=branch
@@ -60,8 +58,8 @@ jobs:
         with:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # build-args: |
-          #   RELEASE_VERSION=${{steps.release_tag.outputs.tag}}
+          build-args: |
+            RELEASE_VERSION=${{steps.release_tag_no_prefix.outputs.tag_no_prefix}}
 
       - name: Look up images
         run: docker image ls
